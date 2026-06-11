@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Archer SafeTrain</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@100;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--white:#FFF;--sand:#E5E0D9;--sand-light:#F2EFEB;--black:#000;--gray:#807A70;--red:#CC0000;--red-light:#FFF0F0}
+html,body{height:100%;background:var(--black);font-family:"Archivo",Arial,sans-serif;color:var(--white);display:flex;align-items:center;justify-content:center;min-height:100vh}
+
+.login-wrap{width:100%;max-width:440px;padding:40px 24px}
+.logo{font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:.2em;color:var(--white);margin-bottom:4px}
+.logo-sub{font-size:10px;color:#444;text-transform:uppercase;letter-spacing:.18em;margin-bottom:48px}
+.prompt{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:#555;margin-bottom:16px}
+
+.user-card{display:flex;align-items:center;gap:16px;padding:16px 20px;border:1.5px solid #1a1a1a;border-radius:3px;cursor:pointer;transition:all .15s;text-decoration:none;margin-bottom:10px;background:transparent}
+.user-card:hover{border-color:#333;background:#0a0a0a}
+.avatar{width:42px;height:42px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+.info{flex:1}
+.name{font-size:13px;font-weight:700;color:var(--white);margin-bottom:3px}
+.role-tag{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.08em}
+.arrow{font-size:16px;color:#2a2a2a}
+.user-card:hover .arrow{color:#555}
+
+.role-badge{display:inline-block;padding:2px 8px;border-radius:2px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-left:8px}
+.rb-emp{background:#1a1a1a;color:#888}
+.rb-mgr{background:#1a1a1a;color:#aaa}
+.rb-safety{background:var(--red);color:var(--white)}
+
+.footer{margin-top:40px;font-size:10px;color:#2a2a2a;text-transform:uppercase;letter-spacing:.1em;text-align:center}
+
+.demo-note{background:#0d0d0d;border:1px solid #1a1a1a;border-radius:3px;padding:14px 16px;margin-bottom:24px;font-size:11px;color:#444;line-height:1.6}
+.demo-note strong{color:#666}
+</style>
+</head>
+<body>
+<div class="login-wrap">
+  <div class="logo">Archer</div>
+  <div class="logo-sub">SafeTrain Portal</div>
+
+  <div class="demo-note">
+    <strong>Demo mode.</strong> Select a role to explore the platform. All data is simulated — no real credentials required.
+  </div>
+
+  <div class="prompt">Sign in as</div>
+
+  <a class="user-card" href="portal.html?role=user">
+    <div class="avatar" style="background:#111;color:var(--red)">AR</div>
+    <div class="info">
+      <div class="name">Alex Reyes <span class="role-badge rb-emp">Employee</span></div>
+      <div class="role-tag">HV Operations Technician · Propulsion</div>
+    </div>
+    <i class="ti ti-chevron-right arrow"></i>
+  </a>
+
+  <a class="user-card" href="portal.html?role=manager">
+    <div class="avatar" style="background:#111;color:#999">SC</div>
+    <div class="info">
+      <div class="name">Sarah Chen <span class="role-badge rb-mgr">Manager</span></div>
+      <div class="role-tag">Propulsion Manager · 12 direct reports</div>
+    </div>
+    <i class="ti ti-chevron-right arrow"></i>
+  </a>
+
+  <a class="user-card" href="portal.html?role=safety">
+    <div class="avatar" style="background:#111;color:var(--red)">JT</div>
+    <div class="info">
+      <div class="name">Dr. Jamie Torres <span class="role-badge rb-safety">Head of Safety</span></div>
+      <div class="role-tag">Head of Safety · 724 employees</div>
+    </div>
+    <i class="ti ti-chevron-right arrow"></i>
+  </a>
+
+  <div class="footer">Archer Aviation · Internal use only · Demo build</div>
+</div>
+</body>
+</html>
