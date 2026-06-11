@@ -2,7 +2,7 @@
 
 HV Safety Training Portal — demo build for Archer Aviation.
 
-**Live site:** https://jevans2001.github.io/Archer-safeTrain-
+**Live site:** https://jevans2001.github.io/Archer-SafeTrain-
 
 ---
 
