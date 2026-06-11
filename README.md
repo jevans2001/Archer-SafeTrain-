@@ -2,7 +2,7 @@
 
 HV Safety Training Portal — demo build for Archer Aviation.
 
-**Live site:** https://jevans2001.github.io/archer-safeTrain
+**Live site:** https://jevans2001.github.io/Archer-safeTrain-
 
 ---
 
@@ -43,7 +43,7 @@ git push origin main
 3. Source: **Deploy from a branch**
 4. Branch: **main** / folder: **/ (root)**
 5. Click **Save**
-6. Wait ~60 seconds, then visit: `https://jevans2001.github.io/archer-safeTrain`
+6. Wait ~60 seconds, then visit: `https://jevans2001.github.io/Archer-safeTrain-`
 
 ### Update later
 
