@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Archer SafeTrain</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@100;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --white:#FFF;--sand:#E5E0D9;--sand-light:#F2EFEB;--black:#000;
+  --gray:#807A70;--gray-light:#C0BAB0;--red:#CC0000;--red-light:#FFF0F0;
+  --green:#006600;--green-light:#F0FFF0;--yellow:#996600;--yellow-light:#FFFBF0;
+  --sidebar:240px;
+}
+html,body{height:100%;background:var(--sand-light);font-family:"Archivo",Arial,sans-serif;font-size:14px;color:var(--black)}
+
+/* ── ROLE SWITCHER (demo bar) ───────────────────────── */
+.demo-bar{background:var(--black);padding:8px 20px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;flex-shrink:0}
+.demo-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:#555;flex-shrink:0}
+.role-btns{display:flex;gap:6px}
+.role-btn{padding:5px 14px;border-radius:2px;border:1.5px solid #333;background:transparent;color:#888;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;cursor:pointer;font-family:"Archivo",Arial,sans-serif;transition:all .12s}
+.role-btn:hover{border-color:#666;color:#ccc}
+.role-btn.active{background:var(--red);border-color:var(--red);color:var(--white)}
+.demo-user{margin-left:auto;font-size:11px;color:#555;font-weight:700;text-transform:uppercase;letter-spacing:.1em}
+
+/* ── LAYOUT ─────────────────────────────────────────── */
+.app{display:flex;height:calc(100vh - 37px)}
+.sidebar{width:var(--sidebar);flex-shrink:0;background:var(--black);display:flex;flex-direction:column;overflow-y:auto}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;width:100%}
+.topbar{padding:14px 24px;border-bottom:1px solid var(--sand);background:var(--white);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.topbar-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.15em}
+.topbar-sub{font-size:12px;color:var(--gray);margin-top:2px}
+.content{flex:1;overflow-y:auto;padding:28px 36px}
+
+/* ── SIDEBAR ─────────────────────────────────────────── */
+.s-logo{padding:18px 16px 14px;border-bottom:1px solid #1a1a1a}
+.s-logo-name{font-size:16px;font-weight:700;color:var(--white);text-transform:uppercase;letter-spacing:.15em}
+.s-logo-sub{font-size:9px;color:#444;text-transform:uppercase;letter-spacing:.15em;margin-top:3px}
+.s-section{padding:14px 16px 4px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:#3a3a3a}
+.s-item{display:flex;align-items:center;gap:10px;padding:9px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#666;cursor:pointer;border-left:2px solid transparent;transition:all .1s}
+.s-item:hover{color:#aaa;background:#0a0a0a}
+.s-item.active{color:var(--white);border-left-color:var(--red);background:#111}
+.s-item i{font-size:15px;flex-shrink:0}
+.s-user{margin-top:auto;padding:12px 16px;border-top:1px solid #1a1a1a}
+.s-user-name{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--white)}
+.s-user-role{font-size:10px;color:#555;margin-top:2px}
+
+/* ── SHARED COMPONENTS ───────────────────────────────── */
+.page-header{margin-bottom:20px}
+.page-title{font-size:22px;font-weight:100;color:var(--black);margin-bottom:4px}
+.page-sub{font-size:13px;color:var(--gray)}
+
+.card{background:var(--white);border:1px solid var(--sand);border-radius:3px;padding:20px;margin-bottom:14px}
+.card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--black);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.card-title i{font-size:16px;color:var(--red)}
+
+.stat-grid{display:grid;gap:12px;margin-bottom:14px}
+.stat-grid-3{grid-template-columns:repeat(3,1fr)}
+.stat-grid-4{grid-template-columns:repeat(4,1fr)}
+.stat-grid-2{grid-template-columns:repeat(2,1fr)}
+.stat-card{background:var(--white);border:1px solid var(--sand);border-radius:3px;padding:16px}
+.stat-val{font-size:32px;font-weight:100;line-height:1;margin-bottom:4px}
+.stat-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray)}
+.stat-sub{font-size:11px;color:var(--gray-light);margin-top:3px}
+
+.badge{display:inline-block;padding:2px 8px;border-radius:2px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.badge-green{background:var(--green-light);color:var(--green);border:1px solid #AADDAA}
+.badge-red{background:var(--red-light);color:var(--red);border:1px solid #FFCCCC}
+.badge-yellow{background:var(--yellow-light);color:var(--yellow);border:1px solid #FFDDAA}
+.badge-gray{background:var(--sand-light);color:var(--gray);border:1px solid var(--sand)}
+.badge-black{background:var(--black);color:var(--white)}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:1.5px solid var(--black);border-radius:2px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;cursor:pointer;background:var(--black);color:var(--white);font-family:"Archivo",Arial,sans-serif;transition:all .12s;white-space:nowrap}
+.btn:hover{background:#222}
+.btn.ghost{background:var(--white);color:var(--black)}
+.btn.ghost:hover{background:var(--sand-light)}
+.btn.red{background:var(--red);border-color:var(--red)}
+.btn.red:hover{background:#aa0000}
+.btn.sm{padding:5px 12px;font-size:9px}
+
+.progress-bar{height:4px;background:var(--sand);border-radius:2px;margin-top:6px}
+.progress-fill{height:4px;border-radius:2px;transition:width .3s}
+.progress-fill.green{background:var(--green)}
+.progress-fill.red{background:var(--red)}
+.progress-fill.yellow{background:var(--yellow)}
+
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:var(--sand-light);padding:9px 12px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);border-bottom:1px solid var(--sand)}
+td{padding:10px 12px;border-bottom:1px solid var(--sand);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--sand-light)}
+
+.warn-box{background:var(--red-light);border:1px solid #FFCCCC;border-left:3px solid var(--red);padding:12px 14px;border-radius:2px;font-size:12px;color:var(--red);line-height:1.6;margin-bottom:14px}
+.info-box{background:var(--sand-light);border:1px solid var(--sand);border-left:3px solid var(--black);padding:12px 14px;border-radius:2px;font-size:12px;color:var(--black);line-height:1.6;margin-bottom:14px}
+.success-box{background:var(--green-light);border:1px solid #AADDAA;border-left:3px solid var(--green);padding:12px 14px;border-radius:2px;font-size:12px;color:var(--green);line-height:1.6;margin-bottom:14px}
+
+/* ── COURSE CARDS (user) ─────────────────────────────── */
+.course-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.course-card{background:var(--white);border:1px solid var(--sand);border-radius:3px;padding:16px;cursor:pointer;transition:border-color .12s}
+.course-card:hover{border-color:var(--gray-light)}
+.course-card.locked{opacity:.5;cursor:not-allowed}
+.cc-level{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--red);margin-bottom:6px}
+.cc-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.cc-meta{font-size:11px;color:var(--gray);margin-bottom:10px}
+.cc-status{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-top:8px}
+
+/* ── CERT CARD ───────────────────────────────────────── */
+.cert-card{background:var(--black);color:var(--white);border-radius:3px;padding:24px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.cert-left h3{font-size:18px;font-weight:100;margin-bottom:6px}
+.cert-left p{font-size:12px;color:#888;line-height:1.6}
+.cert-badge{width:64px;height:64px;border:2px solid var(--red);border-radius:3px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cert-badge i{font-size:32px;color:var(--red)}
+
+/* ── APPROVAL ITEM ───────────────────────────────────── */
+.approval-item{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid var(--sand)}
+.approval-item:last-child{border-bottom:none}
+.approval-avatar{width:36px;height:36px;border-radius:2px;background:var(--sand);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--gray);flex-shrink:0;text-transform:uppercase}
+.approval-body{flex:1}
+.approval-name{font-size:13px;font-weight:700}
+.approval-meta{font-size:11px;color:var(--gray);margin-top:2px;line-height:1.5}
+.approval-actions{display:flex;gap:6px;margin-top:8px}
+
+/* ── DEPT BAR ─────────────────────────────────────────── */
+.dept-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--sand)}
+.dept-row:last-child{border-bottom:none}
+.dept-name{font-size:12px;font-weight:700;width:160px;flex-shrink:0}
+.dept-bar-wrap{flex:1;height:8px;background:var(--sand);border-radius:2px}
+.dept-bar-fill{height:8px;border-radius:2px;transition:width .4s}
+.dept-pct{font-size:11px;font-weight:700;width:36px;text-align:right;flex-shrink:0}
+.dept-count{font-size:10px;color:var(--gray);width:60px;text-align:right;flex-shrink:0}
+
+/* ── ALERT ITEM ───────────────────────────────────────── */
+.alert-item{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--sand);font-size:12px}
+.alert-item:last-child{border-bottom:none}
+.alert-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.alert-body{flex:1;line-height:1.5}
+.alert-time{font-size:10px;color:var(--gray-light);flex-shrink:0;margin-top:2px}
+
+/* ── HIDDEN ──────────────────────────────────────────── */
+.view{display:none}
+.view.active{display:block}
+.role-view{display:none;width:100%}
+.role-view.active{display:flex;height:100%;width:100%}
+
+/* ── LOGIN SCREEN ─────────────────────────────────── */
+.login-overlay{position:fixed;inset:0;background:var(--black);z-index:999;display:flex;align-items:center;justify-content:center}
+.login-box{width:420px;padding:0}
+.login-logo{font-size:24px;font-weight:700;text-transform:uppercase;letter-spacing:.2em;color:var(--white);margin-bottom:4px}
+.login-sub{font-size:11px;color:#444;text-transform:uppercase;letter-spacing:.15em;margin-bottom:48px}
+.login-prompt{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:#555;margin-bottom:16px}
+.login-cards{display:flex;flex-direction:column;gap:10px}
+.login-card{display:flex;align-items:center;gap:16px;padding:16px 20px;border:1.5px solid #1f1f1f;border-radius:3px;cursor:pointer;transition:all .15s;background:transparent}
+.login-card:hover{border-color:#444;background:#0a0a0a}
+.login-avatar{width:40px;height:40px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0;text-transform:uppercase}
+.login-info{flex:1}
+.login-name{font-size:13px;font-weight:700;color:var(--white);margin-bottom:2px}
+.login-role{font-size:11px;color:#555}
+.login-card i.ti-chevron-right{font-size:16px;color:#333}
+.login-card:hover i.ti-chevron-right{color:#666}
+.login-footer{margin-top:40px;font-size:10px;color:#333;text-transform:uppercase;letter-spacing:.1em;text-align:center}
+
+/* ── COURSE MODAL ─────────────────────────────────── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal-window{background:var(--white);border-radius:3px;width:100%;max-width:1100px;height:calc(100vh - 40px);display:flex;flex-direction:column;overflow:hidden}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--sand);background:var(--white);flex-shrink:0}
+.modal-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em}
+.modal-close{width:32px;height:32px;border:1.5px solid var(--sand);border-radius:2px;background:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--gray)}
+.modal-close:hover{background:var(--sand-light)}
+.modal-iframe{flex:1;border:none;width:100%}
+
+/* ── TOAST ────────────────────────────────────────── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--black);color:var(--white);padding:12px 18px;border-radius:3px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px;z-index:999;transform:translateY(80px);opacity:0;transition:all .25s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.green{background:var(--green)}
+.toast.red{background:var(--red)}
+
+/* hide demo bar */
+.demo-bar{display:none!important}
+
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div class="login-overlay" id="login-overlay">
+  <div class="login-box">
+    <div class="login-logo">Archer</div>
+    <div class="login-sub">SafeTrain Portal</div>
+    <div class="login-prompt">Sign in as</div>
+    <div class="login-cards">
+      <div class="login-card" onclick="login('user')">
+        <div class="login-avatar" style="background:#1a1a1a;color:var(--red)">AR</div>
+        <div class="login-info">
+          <div class="login-name">Alex Reyes</div>
+          <div class="login-role">HV Operations Technician · Employee</div>
+        </div>
+        <i class="ti ti-chevron-right"></i>
+      </div>
+      <div class="login-card" onclick="login('manager')">
+        <div class="login-avatar" style="background:#1a1a1a;color:#888">SC</div>
+        <div class="login-info">
+          <div class="login-name">Sarah Chen</div>
+          <div class="login-role">Propulsion Manager · Manager</div>
+        </div>
+        <i class="ti ti-chevron-right"></i>
+      </div>
+      <div class="login-card" onclick="login('safety')">
+        <div class="login-avatar" style="background:#1a1a1a;color:#888">JT</div>
+        <div class="login-info">
+          <div class="login-name">Dr. Jamie Torres</div>
+          <div class="login-role">Head of Safety · Admin</div>
+        </div>
+        <i class="ti ti-chevron-right"></i>
+      </div>
+    </div>
+    <div class="login-footer">Archer Aviation · Internal use only</div>
+  </div>
+</div>
+
+<!-- COURSE MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-window">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Course Viewer</div>
+      <button class="modal-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <iframe class="modal-iframe" id="modal-iframe" src="about:blank"></iframe>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+
+<!-- DEMO ROLE SWITCHER -->
+<div class="demo-bar">
+  <div class="demo-label">Demo — viewing as:</div>
+  <div class="role-btns">
+    <button class="role-btn active" onclick="switchRole('user')">Employee</button>
+    <button class="role-btn" onclick="switchRole('manager')">Manager</button>
+    <button class="role-btn" onclick="switchRole('safety')">Head of Safety</button>
+  </div>
+  <div class="demo-user" id="demo-user-label">Alex Reyes · HV Operations</div>
+</div>
+
+<div class="app">
+
+<!-- ═══════════════════════════════════════════════════
+     EMPLOYEE VIEW
+════════════════════════════════════════════════════ -->
+<div class="role-view active" id="view-user">
+  <nav class="sidebar">
+    <div class="s-logo"><div class="s-logo-name">Archer</div><div class="s-logo-sub">SafeTrain</div></div>
+    <div class="s-section">Training</div>
+    <div class="s-item active" onclick="uNav('u-home',this)"><i class="ti ti-home"></i>Dashboard</div>
+    <div class="s-item" onclick="uNav('u-courses',this)"><i class="ti ti-book-2"></i>My Courses</div>
+    <div class="s-item" onclick="uNav('u-cert',this)"><i class="ti ti-certificate"></i>Certificate</div>
+    <div class="s-section">Account</div>
+    <div class="s-item" onclick="uNav('u-profile',this)"><i class="ti ti-user"></i>My Profile</div>
+    <div class="s-user"><div class="s-user-name">Alex Reyes</div><div class="s-user-role">HV Operations</div><div style="margin-top:10px;padding-top:10px;border-top:1px solid #1a1a1a"><span onclick="logout()" style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#444;cursor:pointer"><i class="ti ti-logout" style="font-size:12px;vertical-align:-2px;margin-right:4px"></i>Switch user</span></div></div>
+  </nav>
+  <div class="main">
+    <div class="topbar">
+      <div><div class="topbar-title" id="u-topbar-title">Dashboard</div><div class="topbar-sub" id="u-topbar-sub">Your training status</div></div>
+    </div>
+    <div class="content">
+
+      <!-- U: HOME -->
+      <div class="view active" id="u-home">
+        <div class="page-header">
+          <div class="page-title">Welcome back, Alex</div>
+          <div class="page-sub">You have active training requirements. Level 2 qualification is pending manager approval.</div>
+        </div>
+        <div class="stat-grid stat-grid-3" style="margin-bottom:14px">
+          <div class="stat-card">
+            <div class="stat-val">2</div>
+            <div class="stat-label">Levels complete</div>
+            <div class="stat-sub">Level 3 in progress</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val" style="color:var(--yellow)">1</div>
+            <div class="stat-label">Pending approval</div>
+            <div class="stat-sub">Level 2 qualification</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val" style="color:var(--red)">47</div>
+            <div class="stat-label">Days until renewal</div>
+            <div class="stat-sub">Level 1 recertification</div>
+          </div>
+        </div>
+
+        <div class="warn-box" style="display:flex;align-items:center;justify-content:space-between;gap:16px"><span><strong>Action required:</strong> Your Level 1 certification expires in 47 days. Complete recertification before it lapses to maintain lab access.</span><button class="btn sm red" onclick="launchCourse('Level 1')" style="flex-shrink:0"><i class="ti ti-arrow-right"></i> Start recertification</button></div>
+
+        <div class="card">
+          <div class="card-title"><span><i class="ti ti-bolt" style="margin-right:6px;color:var(--red)"></i>Training Progress</span></div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                <span style="font-size:12px;font-weight:700">Level 1 — HV Safety Basics</span>
+                <span class="badge badge-green">Complete</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill green" style="width:100%"></div></div>
+              <div style="font-size:10px;color:var(--gray);margin-top:3px">Completed Mar 14, 2026 · Expires Sep 14, 2026</div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                <span style="font-size:12px;font-weight:700">Level 2 — De-energized HV Work</span>
+                <span class="badge badge-yellow">Pending Approval</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill yellow" style="width:100%"></div></div>
+              <div style="font-size:10px;color:var(--gray);margin-top:3px">Quiz passed Apr 2, 2026 · Awaiting manager sign-off</div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                <span style="font-size:12px;font-weight:700">Level 3 — Energized HV Work</span>
+                <span class="badge badge-gray">Locked</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:0%;background:var(--gray-light)"></div></div>
+              <div style="font-size:10px;color:var(--gray);margin-top:3px">Unlocks after Level 2 is approved</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span>Recent Activity</span></div>
+          <div class="alert-item"><i class="ti ti-circle-check alert-icon" style="color:var(--green)"></i><div class="alert-body"><strong>Level 2 quiz passed</strong> — scored 88%. Awaiting manager qualification approval.</div><div class="alert-time">Apr 2</div></div>
+          <div class="alert-item"><i class="ti ti-file-text alert-icon" style="color:var(--black)"></i><div class="alert-body"><strong>HV Qualification Form submitted</strong> — Level 2 form sent to manager Sarah Chen.</div><div class="alert-time">Apr 2</div></div>
+          <div class="alert-item"><i class="ti ti-book-2 alert-icon" style="color:var(--black)"></i><div class="alert-body"><strong>Level 2 course completed</strong> — all 5 modules finished.</div><div class="alert-time">Apr 1</div></div>
+          <div class="alert-item"><i class="ti ti-certificate alert-icon" style="color:var(--green)"></i><div class="alert-body"><strong>Level 1 certified</strong> — qualification approved by Sarah Chen.</div><div class="alert-time">Mar 14</div></div>
+        </div>
+      </div>
+
+      <!-- U: COURSES -->
+      <div class="view" id="u-courses">
+        <div class="page-header"><div class="page-title">My Courses</div><div class="page-sub">Complete all levels to become a Level 3 Qualified Person at Archer.</div></div>
+        <div class="course-grid">
+          <div class="course-card">
+            <div class="cc-level">Level 1</div>
+            <div class="cc-title">HV Safety Basics</div>
+            <div class="cc-meta">5 chapters · 60 min</div>
+            <div class="progress-bar"><div class="progress-fill green" style="width:100%"></div></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+              <span class="badge badge-green">Certified</span>
+              <button class="btn ghost sm" onclick="launchCourse('Level 1')">Review</button>
+            </div>
+          </div>
+          <div class="course-card">
+            <div class="cc-level">Level 2</div>
+            <div class="cc-title">De-energized HV Work</div>
+            <div class="cc-meta">5 modules · 3 hrs</div>
+            <div class="progress-bar"><div class="progress-fill yellow" style="width:100%"></div></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+              <span class="badge badge-yellow">Pending Approval</span>
+              <button class="btn ghost sm">Review</button>
+            </div>
+          </div>
+          <div class="course-card locked">
+            <div class="cc-level">Level 3</div>
+            <div class="cc-title">Energized HV Work</div>
+            <div class="cc-meta">5 modules · 4 hrs</div>
+            <div class="progress-bar"><div class="progress-fill" style="width:0%;background:var(--sand)"></div></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+              <span class="badge badge-gray"><i class="ti ti-lock" style="font-size:9px;margin-right:3px"></i>Locked</span>
+            </div>
+          </div>
+        </div>
+        <div class="info-box"><i class="ti ti-info-circle" style="margin-right:6px"></i>Level 3 unlocks once your Level 2 qualification is approved by your manager.</div>
+        <div class="card">
+          <div class="card-title">Level 2 — Module Breakdown</div>
+          <table>
+            <tr><th>Module</th><th>Status</th><th>Score</th><th>Completed</th></tr>
+            <tr><td>Hazard Identification — 7 Scenarios</td><td><span class="badge badge-green">Done</span></td><td>7/7 scenarios</td><td>Apr 1</td><td><button class="btn ghost sm" onclick="launchScenarios()">Retake</button></td></tr>
+            <tr><td>Approach Boundaries</td><td><span class="badge badge-green">Done</span></td><td>—</td><td>Apr 1</td></tr>
+            <tr><td>PPE</td><td><span class="badge badge-green">Done</span></td><td>—</td><td>Apr 1</td></tr>
+            <tr><td>Lockout/Tagout</td><td><span class="badge badge-green">Done</span></td><td>—</td><td>Apr 1</td></tr>
+            <tr><td>5 Safety Rules</td><td><span class="badge badge-green">Done</span></td><td>—</td><td>Apr 1</td></tr>
+            <tr><td><strong>Level 2 Quiz</strong></td><td><span class="badge badge-green">Passed</span></td><td><strong>88%</strong></td><td>Apr 2</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- U: CERTIFICATE -->
+      <div class="view" id="u-cert">
+        <div class="page-header"><div class="page-title">My Certificate</div><div class="page-sub">Your HV qualification status and downloadable certificates.</div></div>
+        <div class="cert-card">
+          <div class="cert-left">
+            <h3>Level 1 — HV Safety Certified</h3>
+            <p>Issued March 14, 2026 · Expires September 14, 2026<br>Approved by Sarah Chen · HV Safety Manager</p>
+            <div style="margin-top:14px;display:flex;gap:8px">
+              <button class="btn" style="background:var(--white);color:var(--black);border-color:var(--white)"><i class="ti ti-download"></i>Download PDF</button>
+              <button class="btn" style="background:transparent;color:#888;border-color:#444"><i class="ti ti-printer"></i>Print</button>
+            </div>
+          </div>
+          <div class="cert-badge"><i class="ti ti-certificate"></i></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Level 2 — Pending Manager Approval</div>
+          <div class="warn-box" style="margin-bottom:0">Your Level 2 qualification form has been submitted to Sarah Chen. You will receive an email once it is approved. Certificate will be available to download at that time.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Certification History</div>
+          <table>
+            <tr><th>Level</th><th>Status</th><th>Issued</th><th>Expires</th><th>Approved by</th></tr>
+            <tr><td>Level 1</td><td><span class="badge badge-green">Active</span></td><td>Mar 14, 2026</td><td>Sep 14, 2026</td><td>Sarah Chen</td></tr>
+            <tr><td>Level 2</td><td><span class="badge badge-yellow">Pending</span></td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><td>Level 3</td><td><span class="badge badge-gray">Not started</span></td><td>—</td><td>—</td><td>—</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- U: PROFILE -->
+      <div class="view" id="u-profile">
+        <div class="page-header"><div class="page-title">My Profile</div><div class="page-sub">Your account details and training preferences.</div></div>
+        <div class="card">
+          <div class="card-title">Account Information</div>
+          <table>
+            <tr><td style="color:var(--gray);width:160px">Name</td><td>Alex Reyes</td></tr>
+            <tr><td style="color:var(--gray)">Title</td><td>HV Operations Technician</td></tr>
+            <tr><td style="color:var(--gray)">Department</td><td>Propulsion — Ground Test</td></tr>
+            <tr><td style="color:var(--gray)">Manager</td><td>Sarah Chen</td></tr>
+            <tr><td style="color:var(--gray)">Email</td><td>a.reyes@archer.com</td></tr>
+            <tr><td style="color:var(--gray)">Employee ID</td><td>ARC-04471</td></tr>
+            <tr><td style="color:var(--gray)">Start date</td><td>January 6, 2026</td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <div class="card-title">Notification Preferences</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div><div style="font-size:12px;font-weight:700">Recertification reminders</div><div style="font-size:11px;color:var(--gray)">Email 90, 60, and 30 days before expiry</div></div>
+              <span class="badge badge-green">On</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div><div style="font-size:12px;font-weight:700">Approval notifications</div><div style="font-size:11px;color:var(--gray)">Email when manager approves or rejects</div></div>
+              <span class="badge badge-green">On</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div><div style="font-size:12px;font-weight:700">New course availability</div><div style="font-size:11px;color:var(--gray)">Email when a new course is assigned</div></div>
+              <span class="badge badge-green">On</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /view-user -->
+
+
+<!-- ═══════════════════════════════════════════════════
+     MANAGER VIEW
+════════════════════════════════════════════════════ -->
+<div class="role-view" id="view-manager">
+  <nav class="sidebar">
+    <div class="s-logo"><div class="s-logo-name">Archer</div><div class="s-logo-sub">SafeTrain</div></div>
+    <div class="s-section">Team</div>
+    <div class="s-item active" onclick="mNav('m-home',this)"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
+    <div class="s-item" onclick="mNav('m-approvals',this)"><i class="ti ti-clock-check"></i>Approvals <span class="badge badge-red approval-count" style="margin-left:auto">3</span></div>
+    <div class="s-item" onclick="mNav('m-team',this)"><i class="ti ti-users"></i>My Team</div>
+    <div class="s-item" onclick="mNav('m-reminders',this)"><i class="ti ti-bell"></i>Reminders</div>
+    <div class="s-user"><div class="s-user-name">Sarah Chen</div><div class="s-user-role">Propulsion Manager</div><div style="margin-top:10px;padding-top:10px;border-top:1px solid #1a1a1a"><span onclick="logout()" style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#444;cursor:pointer"><i class="ti ti-logout" style="font-size:12px;vertical-align:-2px;margin-right:4px"></i>Switch user</span></div></div>
+  </nav>
+  <div class="main">
+    <div class="topbar">
+      <div><div class="topbar-title" id="m-topbar-title">Team Dashboard</div><div class="topbar-sub" id="m-topbar-sub">Propulsion — Ground Test · 12 direct reports</div></div>
+      <button class="btn ghost sm" onclick="mNav('m-reminders',document.querySelector('#view-manager .s-item:nth-child(6)'));showToast('Opening reminder panel')"><i class="ti ti-bell"></i> Send reminder</button>
+    </div>
+    <div class="content">
+
+      <!-- M: HOME -->
+      <div class="view active" id="m-home">
+        <div class="page-header"><div class="page-title">Team Compliance</div><div class="page-sub">12 direct reports · Propulsion — Ground Test</div></div>
+        <div class="stat-grid stat-grid-4" style="margin-bottom:14px">
+          <div class="stat-card"><div class="stat-val" style="color:var(--green)">7</div><div class="stat-label">Fully compliant</div><div class="stat-sub">All certs current</div></div>
+          <div class="stat-card"><div class="stat-val" style="color:var(--yellow)">3</div><div class="stat-label">Pending approval</div><div class="stat-sub">Awaiting your sign-off</div></div>
+          <div class="stat-card"><div class="stat-val" style="color:var(--red)">2</div><div class="stat-label">Non-compliant</div><div class="stat-sub">Overdue or expired</div></div>
+          <div class="stat-card"><div class="stat-val">58%</div><div class="stat-label">Team compliance</div><div class="stat-sub">7 of 12 fully current</div></div>
+        </div>
+
+        <div class="warn-box"><strong>Action required:</strong> 3 qualification approvals are waiting for your review. 2 team members are out of compliance — lab access may be restricted.</div>
+
+        <div class="card">
+          <div class="card-title"><span>Pending Approvals</span><button class="btn sm" onclick="mNav('m-approvals',document.querySelector('#view-manager .s-item:nth-child(5)'))">View all</button></div>
+          <div class="approval-item" id="approval-ar_l2">
+            <div class="approval-avatar">AR</div>
+            <div class="approval-body">
+              <div class="approval-name">Alex Reyes <span class="badge badge-black" style="margin-left:6px">Level 2</span></div>
+              <div class="approval-meta">HV Operations · Quiz score: 88% · Submitted Apr 2, 2026</div>
+              <div class="approval-actions">
+                <button class="btn sm" style="background:var(--green);border-color:var(--green)" onclick="approveQual('ar_l2','Alex Reyes','2')"><i class="ti ti-check"></i> Approve</button>
+                <button class="btn ghost sm" onclick="rejectQual('ar_l2','Alex Reyes')"><i class="ti ti-x"></i> Reject</button>
+                <button class="btn ghost sm" onclick="showToast('Opening HV Qualification Form...')"><i class="ti ti-eye"></i> View form</button>
+              </div>
+            </div>
+          </div>
+          <div class="approval-item" id="approval-mk_l1">
+            <div class="approval-avatar">MK</div>
+            <div class="approval-body">
+              <div class="approval-name">Marcus Kim <span class="badge badge-black" style="margin-left:6px">Level 1</span></div>
+              <div class="approval-meta">HV Operations · Quiz score: 92% · Submitted Apr 1, 2026</div>
+              <div class="approval-actions">
+                <button class="btn sm" style="background:var(--green);border-color:var(--green)" onclick="approveQual('mk_l1','Marcus Kim','1')"><i class="ti ti-check"></i> Approve</button>
+                <button class="btn ghost sm" onclick="rejectQual('mk_l1','Marcus Kim')"><i class="ti ti-x"></i> Reject</button>
+                <button class="btn ghost sm" onclick="showToast('Opening HV Qualification Form...')"><i class="ti ti-eye"></i> View form</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Non-compliant — Immediate Attention</div>
+          <table>
+            <tr><th>Name</th><th>Issue</th><th>Since</th><th>Action</th></tr>
+            <tr>
+              <td><strong>Jordan Park</strong><br><span style="font-size:10px;color:var(--gray)">Dyno Technician</span></td>
+              <td><span class="badge badge-red">Level 1 expired</span></td>
+              <td>Mar 28, 2026</td>
+              <td><button class="btn ghost sm"><i class="ti ti-bell"></i> Remind</button></td>
+            </tr>
+            <tr>
+              <td><strong>Priya Nair</strong><br><span style="font-size:10px;color:var(--gray)">Test Engineer</span></td>
+              <td><span class="badge badge-red">No training started</span></td>
+              <td>Feb 10, 2026</td>
+              <td><button class="btn ghost sm"><i class="ti ti-bell"></i> Remind</button></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- M: APPROVALS -->
+      <div class="view" id="m-approvals">
+        <div class="page-header"><div class="page-title">Qualification Approvals</div><div class="page-sub">Review and sign off on your team's HV qualification forms.</div></div>
+        <div class="info-box">As a manager, your approval certifies that the employee has demonstrated the skills, behaviors, and awareness required for the qualification level indicated. Review the HV Qualification Form before approving.</div>
+        <div class="card">
+          <div class="card-title">Pending — 3 approvals required</div>
+          <div class="approval-item" id="approw-ar_l2">
+            <div class="approval-avatar">AR</div>
+            <div class="approval-body">
+              <div class="approval-name">Alex Reyes <span class="badge badge-black" style="margin-left:6px">Level 2</span></div>
+              <div class="approval-meta">HV Operations Technician · Quiz: 88% · Submitted Apr 2, 2026<br>All 5 Level 2 modules completed · No deviations recorded</div>
+              <div class="approval-actions">
+                <button class="btn sm" style="background:var(--green);border-color:var(--green)" onclick="approveQual('ar_l2','Alex Reyes','2')"><i class="ti ti-check"></i> Approve qualification</button>
+                <button class="btn ghost sm" onclick="rejectQual('ar_l2','Alex Reyes')"><i class="ti ti-x"></i> Reject</button>
+                <button class="btn ghost sm" onclick="showToast('Opening HV Qualification Form...')"><i class="ti ti-file-text"></i> View HV form</button>
+              </div>
+            </div>
+          </div>
+          <div class="approval-item" id="approw-mk_l1">
+            <div class="approval-avatar">MK</div>
+            <div class="approval-body">
+              <div class="approval-name">Marcus Kim <span class="badge badge-black" style="margin-left:6px">Level 1</span></div>
+              <div class="approval-meta">HV Operations Technician · Quiz: 92% · Submitted Apr 1, 2026<br>All 5 Level 1 chapters completed · No deviations recorded</div>
+              <div class="approval-actions">
+                <button class="btn sm" style="background:var(--green);border-color:var(--green)" onclick="approveQual('mk_l1','Marcus Kim','1')"><i class="ti ti-check"></i> Approve qualification</button>
+                <button class="btn ghost sm" onclick="rejectQual('mk_l1','Marcus Kim')"><i class="ti ti-x"></i> Reject</button>
+                <button class="btn ghost sm" onclick="showToast('Opening HV Qualification Form...')"><i class="ti ti-file-text"></i> View HV form</button>
+              </div>
+            </div>
+          </div>
+          <div class="approval-item" id="approw-lt_l2">
+            <div class="approval-avatar">LT</div>
+            <div class="approval-body">
+              <div class="approval-name">Lisa Tran <span class="badge badge-black" style="margin-left:6px">Level 2</span></div>
+              <div class="approval-meta">Test Technician · Quiz: 80% · Submitted Mar 30, 2026<br>All 5 Level 2 modules completed · Passed on second attempt</div>
+              <div class="approval-actions">
+                <button class="btn sm" style="background:var(--green);border-color:var(--green)" onclick="approveQual('lt_l2','Lisa Tran','2')"><i class="ti ti-check"></i> Approve qualification</button>
+                <button class="btn ghost sm" onclick="rejectQual('lt_l2','Lisa Tran')"><i class="ti ti-x"></i> Reject</button>
+                <button class="btn ghost sm" onclick="showToast('Opening HV Qualification Form...')"><i class="ti ti-file-text"></i> View HV form</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Recently Approved</div>
+          <table>
+            <tr><th>Name</th><th>Level</th><th>Score</th><th>Approved</th><th>Expires</th></tr>
+            <tr><td>Dana Brooks</td><td>Level 1</td><td>94%</td><td>Mar 20, 2026</td><td>Sep 20, 2026</td></tr>
+            <tr><td>James Wu</td><td>Level 2</td><td>86%</td><td>Mar 15, 2026</td><td>Mar 15, 2027</td></tr>
+            <tr><td>Alex Reyes</td><td>Level 1</td><td>91%</td><td>Mar 14, 2026</td><td>Sep 14, 2026</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- M: TEAM -->
+      <div class="view" id="m-team">
+        <div class="page-header"><div class="page-title">My Team</div><div class="page-sub">12 direct reports · Propulsion — Ground Test</div></div>
+        <div class="card">
+          <div class="card-title">All Team Members</div>
+          <table>
+            <tr><th>Name</th><th>Role</th><th>L1</th><th>L2</th><th>L3</th><th>Status</th><th></th></tr>
+            <tr><td><strong>Alex Reyes</strong></td><td style="color:var(--gray);font-size:11px">HV Ops Tech</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-yellow">Pending</span></td><td><span class="badge badge-gray">—</span></td><td><span class="badge badge-yellow">In progress</span></td><td><button class="btn ghost sm">View</button></td></tr>
+            <tr><td><strong>Marcus Kim</strong></td><td style="color:var(--gray);font-size:11px">HV Ops Tech</td><td><span class="badge badge-yellow">Pending</span></td><td><span class="badge badge-gray">—</span></td><td><span class="badge badge-gray">—</span></td><td><span class="badge badge-yellow">In progress</span></td><td><button class="btn ghost sm">View</button></td></tr>
+            <tr><td><strong>Dana Brooks</strong></td><td style="color:var(--gray);font-size:11px">Test Tech</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">Compliant</span></td><td><button class="btn ghost sm">View</button></td></tr>
+            <tr><td><strong>James Wu</strong></td><td style="color:var(--gray);font-size:11px">Test Engineer</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-gray">—</span></td><td><span class="badge badge-green">Compliant</span></td><td><button class="btn ghost sm">View</button></td></tr>
+            <tr><td><strong>Lisa Tran</strong></td><td style="color:var(--gray);font-size:11px">Test Tech</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-yellow">Pending</span></td><td><span class="badge badge-gray">—</span></td><td><span class="badge badge-yellow">In progress</span></td><td><button class="btn ghost sm">View</button></td></tr>
+            <tr><td><strong>Jordan Park</strong></td><td style="color:var(--gray);font-size:11px">Dyno Tech</td><td><span class="badge badge-red">Expired</span></td><td><span class="badge badge-gray">—</span></td><td><span class="badge badge-gray">—</span></td><td><span class="badge badge-red">Non-compliant</span></td><td><button class="btn ghost sm">View</button></td></tr>
+            <tr><td><strong>Priya Nair</strong></td><td style="color:var(--gray);font-size:11px">Test Engineer</td><td><span class="badge badge-gray">—</span></td><td><span class="badge badge-gray">—</span></td><td><span class="badge badge-gray">—</span></td><td><span class="badge badge-red">Not started</span></td><td><button class="btn ghost sm">View</button></td></tr>
+            <tr><td><strong>Ryan Cho</strong></td><td style="color:var(--gray);font-size:11px">HV Ops Tech</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-gray">—</span></td><td><span class="badge badge-green">Compliant</span></td><td><button class="btn ghost sm">View</button></td></tr>
+            <tr><td><strong>Mei Zhou</strong></td><td style="color:var(--gray);font-size:11px">Test Tech</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">Compliant</span></td><td><button class="btn ghost sm">View</button></td></tr>
+            <tr><td><strong>Carlos Vega</strong></td><td style="color:var(--gray);font-size:11px">Dyno Tech</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-gray">—</span></td><td><span class="badge badge-gray">—</span></td><td><span class="badge badge-green">Compliant</span></td><td><button class="btn ghost sm">View</button></td></tr>
+            <tr><td><strong>Aisha Osei</strong></td><td style="color:var(--gray);font-size:11px">Test Engineer</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-gray">—</span></td><td><span class="badge badge-green">Compliant</span></td><td><button class="btn ghost sm">View</button></td></tr>
+            <tr><td><strong>Ben Hartley</strong></td><td style="color:var(--gray);font-size:11px">HV Ops Tech</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-gray">—</span></td><td><span class="badge badge-gray">—</span></td><td><span class="badge badge-green">Compliant</span></td><td><button class="btn ghost sm">View</button></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- M: REMINDERS -->
+      <div class="view" id="m-reminders">
+        <div class="page-header"><div class="page-title">Send Reminders</div><div class="page-sub">Notify team members about overdue or upcoming training requirements.</div></div>
+        <div class="card">
+          <div class="card-title">Quick Send — Non-compliant members</div>
+          <div class="approval-item">
+            <div class="approval-avatar" style="background:var(--red-light);color:var(--red)">JP</div>
+            <div class="approval-body">
+              <div class="approval-name">Jordan Park <span class="badge badge-red" style="margin-left:6px">Level 1 expired</span></div>
+              <div class="approval-meta">Dyno Technician · Expired Mar 28, 2026 · Lab access may be restricted</div>
+              <div class="approval-actions">
+                <button class="btn sm red" onclick="sendReminder('Jordan Park')"><i class="ti ti-bell"></i> Send urgent reminder</button>
+                <button class="btn ghost sm" onclick="showToast('Opening email composer...')"><i class="ti ti-mail"></i> Custom email</button>
+              </div>
+            </div>
+          </div>
+          <div class="approval-item">
+            <div class="approval-avatar" style="background:var(--red-light);color:var(--red)">PN</div>
+            <div class="approval-body">
+              <div class="approval-name">Priya Nair <span class="badge badge-red" style="margin-left:6px">No training started</span></div>
+              <div class="approval-meta">Test Engineer · Hired Feb 10, 2026 · 57 days without any training</div>
+              <div class="approval-actions">
+                <button class="btn sm red" onclick="sendReminder('Priya Nair')"><i class="ti ti-bell"></i> Send urgent reminder</button>
+                <button class="btn ghost sm" onclick="showToast('Opening email composer...')"><i class="ti ti-mail"></i> Custom email</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Upcoming Expirations — Next 90 days</div>
+          <table>
+            <tr><th>Name</th><th>Certification</th><th>Expires</th><th>Days left</th><th></th></tr>
+            <tr><td>Alex Reyes</td><td>Level 1</td><td>Sep 14, 2026</td><td><span class="badge badge-yellow">47 days</span></td><td><button class="btn ghost sm"><i class="ti ti-bell"></i> Remind</button></td></tr>
+            <tr><td>Ben Hartley</td><td>Level 1</td><td>Sep 22, 2026</td><td><span class="badge badge-yellow">55 days</span></td><td><button class="btn ghost sm"><i class="ti ti-bell"></i> Remind</button></td></tr>
+            <tr><td>Carlos Vega</td><td>Level 1</td><td>Oct 1, 2026</td><td><span class="badge badge-green">64 days</span></td><td><button class="btn ghost sm"><i class="ti ti-bell"></i> Remind</button></td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <div class="card-title">Send Bulk Reminder</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn ghost"><i class="ti ti-users"></i> All non-compliant (2)</button>
+            <button class="btn ghost"><i class="ti ti-clock"></i> Expiring in 60 days (2)</button>
+            <button class="btn ghost"><i class="ti ti-clock"></i> Expiring in 90 days (3)</button>
+            <button class="btn ghost"><i class="ti ti-user-x"></i> No training started (1)</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div><!-- /view-manager -->
+
+
+<!-- ═══════════════════════════════════════════════════
+     HEAD OF SAFETY VIEW
+════════════════════════════════════════════════════ -->
+<div class="role-view" id="view-safety">
+  <nav class="sidebar">
+    <div class="s-logo"><div class="s-logo-name">Archer</div><div class="s-logo-sub">SafeTrain</div></div>
+    <div class="s-section">Overview</div>
+    <div class="s-item active" onclick="sNav('s-home',this)"><i class="ti ti-chart-bar"></i>Org Dashboard</div>
+    <div class="s-item" onclick="sNav('s-departments',this)"><i class="ti ti-building"></i>Departments</div>
+    <div class="s-item" onclick="sNav('s-employees',this)"><i class="ti ti-users"></i>All Employees</div>
+    <div class="s-section">Admin</div>
+    <div class="s-item" onclick="sNav('s-courses',this)"><i class="ti ti-book-2"></i>Manage Courses</div>
+    <div class="s-item" onclick="sNav('s-reports',this)"><i class="ti ti-file-analytics"></i>Reports</div>
+    <div class="s-item" onclick="window.open('safetrain-gmail-templates.html','_blank')"><i class="ti ti-mail"></i>Email Templates</div>
+    <div class="s-item" onclick="sNav('s-settings',this)"><i class="ti ti-settings"></i>Settings</div>
+    <div class="s-user"><div class="s-user-name">Dr. Jamie Torres</div><div class="s-user-role">Head of Safety</div><div style="margin-top:10px;padding-top:10px;border-top:1px solid #1a1a1a"><span onclick="logout()" style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#444;cursor:pointer"><i class="ti ti-logout" style="font-size:12px;vertical-align:-2px;margin-right:4px"></i>Switch user</span></div></div>
+  </nav>
+  <div class="main">
+    <div class="topbar">
+      <div><div class="topbar-title" id="s-topbar-title">Org Dashboard</div><div class="topbar-sub" id="s-topbar-sub">Archer Aviation · All departments · 724 employees</div></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn ghost sm" onclick="sNav('s-reports',document.querySelector('#view-safety .s-item:nth-child(9)'));showToast('Opening reports...')"><i class="ti ti-download"></i> Export report</button>
+        <button class="btn sm red" onclick="showToast('Broadcast reminder sent to all 64 non-compliant employees','green')"><i class="ti ti-bell"></i> Broadcast reminder</button>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- S: HOME -->
+      <div class="view active" id="s-home">
+        <div class="page-header"><div class="page-title">Org-wide Compliance</div><div class="page-sub">724 employees across all departments · As of June 9, 2026</div></div>
+        <div class="stat-grid stat-grid-4" style="margin-bottom:14px">
+          <div class="stat-card"><div class="stat-val" style="color:var(--green)">531</div><div class="stat-label">Fully compliant</div><div class="stat-sub">73% of workforce</div></div>
+          <div class="stat-card"><div class="stat-val" style="color:var(--yellow)">87</div><div class="stat-label">In progress</div><div class="stat-sub">Active training</div></div>
+          <div class="stat-card"><div class="stat-val" style="color:var(--red)">64</div><div class="stat-label">Non-compliant</div><div class="stat-sub">Expired or not started</div></div>
+          <div class="stat-card"><div class="stat-val" style="color:var(--yellow)">42</div><div class="stat-label">Expiring &lt;90 days</div><div class="stat-sub">Action recommended</div></div>
+        </div>
+
+        <div class="warn-box"><strong>64 employees are currently non-compliant.</strong> 18 have expired certifications — their lab access should be reviewed immediately.</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+          <div class="card" style="margin-bottom:0">
+            <div class="card-title">Compliance by Level</div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span><strong>Level 1</strong> — Required for all lab access</span><span style="font-weight:700">89%</span></div>
+                <div class="progress-bar"><div class="progress-fill green" style="width:89%"></div></div>
+                <div style="font-size:10px;color:var(--gray);margin-top:2px">645 / 724 employees certified</div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span><strong>Level 2</strong> — De-energized HV work</span><span style="font-weight:700">61%</span></div>
+                <div class="progress-bar"><div class="progress-fill yellow" style="width:61%"></div></div>
+                <div style="font-size:10px;color:var(--gray);margin-top:2px">244 / 400 required employees certified</div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span><strong>Level 3</strong> — Energized HV work</span><span style="font-weight:700">44%</span></div>
+                <div class="progress-bar"><div class="progress-fill red" style="width:44%"></div></div>
+                <div style="font-size:10px;color:var(--gray);margin-top:2px">88 / 200 required employees certified</div>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:0">
+            <div class="card-title">Recent Activity</div>
+            <div class="alert-item"><i class="ti ti-circle-check alert-icon" style="color:var(--green)"></i><div class="alert-body"><strong>14 new certifications</strong> issued this week across all levels.</div><div class="alert-time">Today</div></div>
+            <div class="alert-item"><i class="ti ti-alert-triangle alert-icon" style="color:var(--red)"></i><div class="alert-body"><strong>3 Level 1 certifications expired</strong> — Propulsion, Avionics, Structures.</div><div class="alert-time">Jun 7</div></div>
+            <div class="alert-item"><i class="ti ti-users alert-icon" style="color:var(--black)"></i><div class="alert-body"><strong>8 new hires</strong> enrolled in Level 1 onboarding.</div><div class="alert-time">Jun 6</div></div>
+            <div class="alert-item"><i class="ti ti-file-analytics alert-icon" style="color:var(--black)"></i><div class="alert-body"><strong>Q2 compliance report</strong> generated and sent to VP of Engineering.</div><div class="alert-time">Jun 1</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span>Compliance by Department</span><button class="btn ghost sm" onclick="sNav('s-departments',document.querySelector('#view-safety .s-item:nth-child(5)'))">Full breakdown</button></div>
+          <div style="padding:4px 0">
+            <div class="dept-row"><div class="dept-name">Propulsion</div><div class="dept-bar-wrap"><div class="dept-bar-fill green" style="width:78%"></div></div><div class="dept-pct" style="color:var(--green)">78%</div><div class="dept-count" style="color:var(--gray)">140 emp</div></div>
+            <div class="dept-row"><div class="dept-name">Avionics</div><div class="dept-bar-wrap"><div class="dept-bar-fill green" style="width:82%"></div></div><div class="dept-pct" style="color:var(--green)">82%</div><div class="dept-count" style="color:var(--gray)">98 emp</div></div>
+            <div class="dept-row"><div class="dept-name">Structures</div><div class="dept-bar-wrap"><div class="dept-bar-fill yellow" style="width:65%"></div></div><div class="dept-pct" style="color:var(--yellow)">65%</div><div class="dept-count" style="color:var(--gray)">112 emp</div></div>
+            <div class="dept-row"><div class="dept-name">GN&C</div><div class="dept-bar-wrap"><div class="dept-bar-fill green" style="width:91%"></div></div><div class="dept-pct" style="color:var(--green)">91%</div><div class="dept-count" style="color:var(--gray)">54 emp</div></div>
+            <div class="dept-row"><div class="dept-name">Manufacturing</div><div class="dept-bar-wrap"><div class="dept-bar-fill red" style="width:48%"></div></div><div class="dept-pct" style="color:var(--red)">48%</div><div class="dept-count" style="color:var(--gray)">186 emp</div></div>
+            <div class="dept-row"><div class="dept-name">Flight Test</div><div class="dept-bar-wrap"><div class="dept-bar-fill green" style="width:95%"></div></div><div class="dept-pct" style="color:var(--green)">95%</div><div class="dept-count" style="color:var(--gray)">42 emp</div></div>
+            <div class="dept-row"><div class="dept-name">Software</div><div class="dept-bar-wrap"><div class="dept-bar-fill yellow" style="width:61%"></div></div><div class="dept-pct" style="color:var(--yellow)">61%</div><div class="dept-count" style="color:var(--gray)">92 emp</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S: DEPARTMENTS -->
+      <div class="view" id="s-departments">
+        <div class="page-header"><div class="page-title">Department Breakdown</div><div class="page-sub">Compliance status across all Archer departments.</div></div>
+        <div class="card">
+          <div class="card-title">All Departments</div>
+          <table>
+            <tr><th>Department</th><th>Employees</th><th>L1 %</th><th>L2 %</th><th>L3 %</th><th>Overall</th><th>Non-compliant</th><th></th></tr>
+            <tr><td><strong>Flight Test</strong></td><td>42</td><td><span class="badge badge-green">98%</span></td><td><span class="badge badge-green">90%</span></td><td><span class="badge badge-green">85%</span></td><td><span class="badge badge-green">95%</span></td><td>2</td><td><button class="btn ghost sm">Details</button></td></tr>
+            <tr><td><strong>GN&C</strong></td><td>54</td><td><span class="badge badge-green">96%</span></td><td><span class="badge badge-green">88%</span></td><td><span class="badge badge-yellow">71%</span></td><td><span class="badge badge-green">91%</span></td><td>5</td><td><button class="btn ghost sm">Details</button></td></tr>
+            <tr><td><strong>Avionics</strong></td><td>98</td><td><span class="badge badge-green">94%</span></td><td><span class="badge badge-green">80%</span></td><td><span class="badge badge-yellow">62%</span></td><td><span class="badge badge-green">82%</span></td><td>18</td><td><button class="btn ghost sm">Details</button></td></tr>
+            <tr><td><strong>Propulsion</strong></td><td>140</td><td><span class="badge badge-green">91%</span></td><td><span class="badge badge-yellow">74%</span></td><td><span class="badge badge-yellow">55%</span></td><td><span class="badge badge-green">78%</span></td><td>31</td><td><button class="btn ghost sm">Details</button></td></tr>
+            <tr><td><strong>Software</strong></td><td>92</td><td><span class="badge badge-yellow">78%</span></td><td><span class="badge badge-yellow">62%</span></td><td><span class="badge badge-gray">N/A</span></td><td><span class="badge badge-yellow">61%</span></td><td>36</td><td><button class="btn ghost sm">Details</button></td></tr>
+            <tr><td><strong>Structures</strong></td><td>112</td><td><span class="badge badge-yellow">76%</span></td><td><span class="badge badge-yellow">60%</span></td><td><span class="badge badge-red">38%</span></td><td><span class="badge badge-yellow">65%</span></td><td>39</td><td><button class="btn ghost sm">Details</button></td></tr>
+            <tr><td><strong>Manufacturing</strong></td><td>186</td><td><span class="badge badge-yellow">66%</span></td><td><span class="badge badge-red">32%</span></td><td><span class="badge badge-red">14%</span></td><td><span class="badge badge-red">48%</span></td><td>97</td><td><button class="btn ghost sm">Details</button></td></tr>
+          </table>
+        </div>
+        <div class="warn-box"><strong>Manufacturing is significantly below target.</strong> 97 employees non-compliant. Recommend targeted campaign and mandatory deadline. Consider temporary lab access restrictions.</div>
+      </div>
+
+      <!-- S: EMPLOYEES -->
+      <div class="view" id="s-employees">
+        <div class="page-header"><div class="page-title">All Employees</div><div class="page-sub">724 employees · Search and filter by department, level, or compliance status.</div></div>
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+          <button class="btn ghost sm">All departments</button>
+          <button class="btn ghost sm">All levels</button>
+          <button class="btn ghost sm" style="border-color:var(--red);color:var(--red)">Non-compliant only</button>
+          <button class="btn ghost sm">Expiring soon</button>
+          <button class="btn ghost sm">No training</button>
+          <div style="margin-left:auto"><button class="btn ghost sm"><i class="ti ti-download"></i> Export CSV</button></div>
+        </div>
+        <div class="card">
+          <table>
+            <tr><th>Name</th><th>Department</th><th>Role</th><th>L1</th><th>L2</th><th>L3</th><th>Status</th><th></th></tr>
+            <tr><td><strong>Alex Reyes</strong></td><td style="font-size:11px;color:var(--gray)">Propulsion</td><td style="font-size:11px;color:var(--gray)">HV Ops Tech</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-yellow">Pending</span></td><td><span class="badge badge-gray">—</span></td><td><span class="badge badge-yellow">In progress</span></td><td><button class="btn ghost sm">View</button></td></tr>
+            <tr><td><strong>Jordan Park</strong></td><td style="font-size:11px;color:var(--gray)">Propulsion</td><td style="font-size:11px;color:var(--gray)">Dyno Tech</td><td><span class="badge badge-red">Expired</span></td><td><span class="badge badge-gray">—</span></td><td><span class="badge badge-gray">—</span></td><td><span class="badge badge-red">Non-compliant</span></td><td><button class="btn ghost sm">View</button></td></tr>
+            <tr><td><strong>Dana Brooks</strong></td><td style="font-size:11px;color:var(--gray)">Propulsion</td><td style="font-size:11px;color:var(--gray)">Test Tech</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">Compliant</span></td><td><button class="btn ghost sm">View</button></td></tr>
+            <tr><td><strong>Priya Nair</strong></td><td style="font-size:11px;color:var(--gray)">Propulsion</td><td style="font-size:11px;color:var(--gray)">Test Eng</td><td><span class="badge badge-gray">—</span></td><td><span class="badge badge-gray">—</span></td><td><span class="badge badge-gray">—</span></td><td><span class="badge badge-red">Not started</span></td><td><button class="btn ghost sm">View</button></td></tr>
+            <tr><td colspan="9" style="text-align:center;color:var(--gray);font-size:11px;padding:16px">Showing 4 of 724 employees · Connect to database to load full roster</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- S: COURSES -->
+      <div class="view" id="s-courses">
+        <div class="page-header"><div class="page-title">Manage Courses</div><div class="page-sub">Edit course content, passing thresholds, and required audiences.</div></div>
+        <div class="card">
+          <div class="card-title"><span>Active Courses</span><button class="btn sm"><i class="ti ti-plus"></i> Add course</button></div>
+          <table>
+            <tr><th>Course</th><th>Modules</th><th>Pass mark</th><th>Required for</th><th>Enrolled</th><th>Validity</th><th></th></tr>
+            <tr><td><strong>Level 1 — HV Safety Basics</strong></td><td>5</td><td>80%</td><td>All employees</td><td>724</td><td>6 months</td><td><div style="display:flex;gap:4px"><button class="btn ghost sm">Edit</button><button class="btn ghost sm">Preview</button></div></td></tr>
+            <tr><td><strong>Level 2 — De-energized HV Work</strong></td><td>5</td><td>80%</td><td>HV roles</td><td>412</td><td>12 months</td><td><div style="display:flex;gap:4px"><button class="btn ghost sm">Edit</button><button class="btn ghost sm">Preview</button></div></td></tr>
+            <tr><td><strong>Level 3 — Energized HV Work</strong></td><td>5</td><td>80%</td><td>L3 qualified roles</td><td>200</td><td>12 months</td><td><div style="display:flex;gap:4px"><button class="btn ghost sm">Edit</button><button class="btn ghost sm">Preview</button></div></td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <div class="card-title">Quiz Bank</div>
+          <table>
+            <tr><th>Level</th><th>Questions</th><th>Questions per attempt</th><th>Attempts allowed</th><th>Time limit</th><th></th></tr>
+            <tr><td>Level 1</td><td>25</td><td>20</td><td>1 (retake course)</td><td>30 min</td><td><button class="btn ghost sm">Edit</button></td></tr>
+            <tr><td>Level 2</td><td>25</td><td>20</td><td>1 (retake course)</td><td>30 min</td><td><button class="btn ghost sm">Edit</button></td></tr>
+            <tr><td>Level 3</td><td>20</td><td>20</td><td>1 (retake course)</td><td>30 min</td><td><button class="btn ghost sm">Edit</button></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- S: REPORTS -->
+      <div class="view" id="s-reports">
+        <div class="page-header"><div class="page-title">Reports</div><div class="page-sub">Generate and export compliance reports for leadership and regulatory use.</div></div>
+        <div class="card">
+          <div class="card-title">Available Reports</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid var(--sand);border-radius:2px">
+              <div><div style="font-size:13px;font-weight:700">Org-wide Compliance Summary</div><div style="font-size:11px;color:var(--gray);margin-top:2px">Overall compliance rate by level and department. Suitable for VP/exec reporting.</div></div>
+              <div style="display:flex;gap:6px"><button class="btn ghost sm"><i class="ti ti-eye"></i> Preview</button><button class="btn sm"><i class="ti ti-download"></i> Export PDF</button></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid var(--sand);border-radius:2px">
+              <div><div style="font-size:13px;font-weight:700">Non-compliant Employee List</div><div style="font-size:11px;color:var(--gray);margin-top:2px">Full list of employees with expired or missing certifications, with days overdue.</div></div>
+              <div style="display:flex;gap:6px"><button class="btn ghost sm"><i class="ti ti-eye"></i> Preview</button><button class="btn sm"><i class="ti ti-download"></i> Export CSV</button></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid var(--sand);border-radius:2px">
+              <div><div style="font-size:13px;font-weight:700">Expiring Certifications — Next 90 Days</div><div style="font-size:11px;color:var(--gray);margin-top:2px">List of certifications expiring in the next 30, 60, and 90 days across all departments.</div></div>
+              <div style="display:flex;gap:6px"><button class="btn ghost sm"><i class="ti ti-eye"></i> Preview</button><button class="btn sm"><i class="ti ti-download"></i> Export CSV</button></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid var(--sand);border-radius:2px">
+              <div><div style="font-size:13px;font-weight:700">Department Manager Report</div><div style="font-size:11px;color:var(--gray);margin-top:2px">Per-department compliance summary auto-sent to each department manager.</div></div>
+              <div style="display:flex;gap:6px"><button class="btn ghost sm"><i class="ti ti-clock"></i> Schedule</button><button class="btn sm"><i class="ti ti-send"></i> Send now</button></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid var(--sand);border-radius:2px">
+              <div><div style="font-size:13px;font-weight:700">NFPA 70E Audit Trail</div><div style="font-size:11px;color:var(--gray);margin-top:2px">Immutable log of all training completions, approvals, and qualification changes for regulatory use.</div></div>
+              <div style="display:flex;gap:6px"><button class="btn ghost sm"><i class="ti ti-eye"></i> Preview</button><button class="btn sm"><i class="ti ti-download"></i> Export PDF</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S: SETTINGS -->
+      <div class="view" id="s-settings">
+        <div class="page-header"><div class="page-title">Settings</div><div class="page-sub">Configure certification validity, reminders, and role assignments.</div></div>
+        <div class="card">
+          <div class="card-title">Certification Validity Periods</div>
+          <table>
+            <tr><th>Level</th><th>Validity</th><th>Reminder at</th><th></th></tr>
+            <tr><td>Level 1</td><td>6 months</td><td>90, 60, 30 days before expiry</td><td><button class="btn ghost sm">Edit</button></td></tr>
+            <tr><td>Level 2</td><td>12 months</td><td>90, 60, 30 days before expiry</td><td><button class="btn ghost sm">Edit</button></td></tr>
+            <tr><td>Level 3</td><td>12 months</td><td>90, 60, 30 days before expiry</td><td><button class="btn ghost sm">Edit</button></td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <div class="card-title">Role Assignment Rules</div>
+          <div class="info-box" style="margin-bottom:12px">Roles are assigned automatically based on job title from Active Directory. Override rules can be set below.</div>
+          <table>
+            <tr><th>Job title contains</th><th>Assigned role</th><th>Required level</th><th></th></tr>
+            <tr><td>HV Operations, Test Engineer, Dyno Tech</td><td>Employee (L2/L3 required)</td><td>Level 2 minimum</td><td><button class="btn ghost sm">Edit</button></td></tr>
+            <tr><td>Manager, Lead, Director</td><td>Manager</td><td>Level 1 minimum</td><td><button class="btn ghost sm">Edit</button></td></tr>
+            <tr><td>Head of Safety, Safety Director</td><td>Head of Safety</td><td>Level 3 minimum</td><td><button class="btn ghost sm">Edit</button></td></tr>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div><!-- /view-safety -->
+
+</div><!-- /app -->
+
+<script>
+// ── STATE ───────────────────────────────────────────
+let currentRole = null;
+let approvalState = {
+  ar_l2: 'pending',  // Alex Reyes L2
+  mk_l1: 'pending',  // Marcus Kim L1
+  lt_l2: 'pending',  // Lisa Tran L2
+};
+
+const USERS = {
+  user:    { label: 'Alex Reyes · HV Operations' },
+  manager: { label: 'Sarah Chen · Propulsion Manager' },
+  safety:  { label: 'Dr. Jamie Torres · Head of Safety' },
+};
+
+// ── LOGIN ──────────────────────────────────────────
+function login(role) {
+  currentRole = role;
+  document.getElementById('login-overlay').style.display = 'none';
+  document.querySelectorAll('.role-view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + role).classList.add('active');
+  const el = document.querySelector(`.role-btn[onclick="switchRole('${role}')"]`);
+  if (el) el.classList.add('active');
+  document.getElementById('demo-user-label').textContent = USERS[role].label;
+}
+
+function logout() {
+  document.getElementById('login-overlay').style.display = 'flex';
+  document.querySelectorAll('.role-view').forEach(v => v.classList.remove('active'));
+  currentRole = null;
+}
+
+function switchRole(role) {
+  login(role);
+}
+
+// ── TOAST ──────────────────────────────────────────
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.className = 'toast' + (type ? ' '+type : '');
+  t.innerHTML = `<i class="ti ti-${type==='green'?'circle-check':type==='red'?'circle-x':'info-circle'}"></i>${msg}`;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── MODAL ──────────────────────────────────────────
+function openModal(title, src) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-iframe').src = src;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.getElementById('modal-iframe').src = 'about:blank';
+}
+
+// ── COURSE LAUNCH (employee) ───────────────────────
+function launchCourse(level) {
+  openModal('HV Safety Training — ' + level, 'courses.html');
+}
+function launchScenarios() {
+  window.open('scenarios.html', '_blank');
+}
+
+// ── APPROVALS ─────────────────────────────────────
+function approveQual(id, name, level) {
+  const row = document.getElementById('approval-' + id);
+  if (row) row.style.display = 'none';
+  // also hide in m-approvals if exists
+  const row2 = document.getElementById('approw-' + id);
+  if (row2) row2.style.display = 'none';
+  approvalState[id] = 'approved';
+  showToast(name + ' Level ' + level + ' qualification approved', 'green');
+  updateApprovalCount();
+  // Update team table badge
+  const teamBadge = document.getElementById('team-' + id);
+  if (teamBadge) { teamBadge.className = 'badge badge-green'; teamBadge.textContent = '✓'; }
+}
+
+function rejectQual(id, name) {
+  const row = document.getElementById('approval-' + id);
+  if (row) row.style.display = 'none';
+  const row2 = document.getElementById('approw-' + id);
+  if (row2) row2.style.display = 'none';
+  approvalState[id] = 'rejected';
+  showToast(name + ' qualification rejected — they will be notified', 'red');
+  updateApprovalCount();
+}
+
+function sendReminder(name) {
+  showToast('Reminder sent to ' + name, 'green');
+}
+
+function updateApprovalCount() {
+  const pending = Object.values(approvalState).filter(s => s === 'pending').length;
+  document.querySelectorAll('.approval-count').forEach(el => {
+    el.textContent = pending;
+    el.style.display = pending === 0 ? 'none' : '';
+  });
+  if (pending === 0) showToast('All approvals complete', 'green');
+}
+
+// ── NAV HELPERS ────────────────────────────────────
+function uNav(viewId, el) {
+  document.querySelectorAll('#view-user .view').forEach(v => v.classList.remove('active'));
+  document.getElementById(viewId).classList.add('active');
+  document.querySelectorAll('#view-user .s-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const titles = {
+    'u-home':    ['Dashboard','Your training status'],
+    'u-courses': ['My Courses','All levels and module detail'],
+    'u-cert':    ['Certificate','Your HV qualification certificates'],
+    'u-profile': ['My Profile','Account and notification settings']
+  };
+  const t = titles[viewId];
+  if (t) { document.getElementById('u-topbar-title').textContent = t[0]; document.getElementById('u-topbar-sub').textContent = t[1]; }
+}
+
+function mNav(viewId, el) {
+  document.querySelectorAll('#view-manager .view').forEach(v => v.classList.remove('active'));
+  document.getElementById(viewId).classList.add('active');
+  document.querySelectorAll('#view-manager .s-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const titles = {
+    'm-home':      ['Team Dashboard','Propulsion — Ground Test · 12 direct reports'],
+    'm-approvals': ['Qualification Approvals','Review and sign off on your team'],
+    'm-team':      ['My Team','All direct reports and compliance status'],
+    'm-reminders': ['Send Reminders','Notify team members about training requirements']
+  };
+  const t = titles[viewId];
+  if (t) { document.getElementById('m-topbar-title').textContent = t[0]; document.getElementById('m-topbar-sub').textContent = t[1]; }
+}
+
+function sNav(viewId, el) {
+  document.querySelectorAll('#view-safety .view').forEach(v => v.classList.remove('active'));
+  document.getElementById(viewId).classList.add('active');
+  document.querySelectorAll('#view-safety .s-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const titles = {
+    's-home':        ['Org Dashboard','Archer Aviation · All departments · 724 employees'],
+    's-departments': ['Departments','Compliance breakdown by department'],
+    's-employees':   ['All Employees','724 employees across all departments'],
+    's-courses':     ['Manage Courses','Edit content, thresholds, and audiences'],
+    's-reports':     ['Reports','Export compliance reports'],
+    's-settings':    ['Settings','Configure validity, reminders, and roles']
+  };
+  const t = titles[viewId];
+  if (t) { document.getElementById('s-topbar-title').textContent = t[0]; document.getElementById('s-topbar-sub').textContent = t[1]; }
+}
+</script>
