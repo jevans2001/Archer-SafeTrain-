@@ -76,5 +76,324 @@ html,body{height:100%;background:var(--black);font-family:"Archivo",Arial,sans-s
 
   <div class="footer">Archer Aviation · Internal use only · Demo build</div>
 </div>
+
+<script>
+// ── ARCHER SAFETRAIN — ELEVENLABS VOICE READER ──────────────────
+// Drop your ElevenLabs API key below to activate.
+// Get a free key at: https://elevenlabs.io (10,000 chars/month free)
+// ────────────────────────────────────────────────────────────────
+
+const ELEVEN_API_KEY = 'YOUR_API_KEY_HERE';
+const ELEVEN_VOICE_ID = 'nPczCjzI2devNBz1zQrb'; // Brian - clear, professional US male
+const ELEVEN_MODEL = 'eleven_turbo_v2_5'; // Fastest + cheapest model
+
+// ── STATE ────────────────────────────────────────────────────────
+const ttsState = {
+  playing: false,
+  loading: false,
+  audio: null,
+  abortController: null
+};
+
+// ── INJECT FLOATING BUTTON ───────────────────────────────────────
+function injectVoiceButton() {
+  const btn = document.createElement('div');
+  btn.id = 'voice-fab';
+  btn.innerHTML = `
+    <div id="voice-fab-inner" title="Read page aloud">
+      <svg id="voice-icon-play" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+      </svg>
+      <svg id="voice-icon-pause" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+        <rect x="6" y="4" width="4" height="16"></rect>
+        <rect x="14" y="4" width="4" height="16"></rect>
+      </svg>
+      <svg id="voice-icon-loading" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+        <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+      </svg>
+      <div id="voice-tooltip">Read aloud</div>
+    </div>
+  `;
+  document.body.appendChild(btn);
+
+  // Inject styles
+  const style = document.createElement('style');
+  style.textContent = `
+    #voice-fab {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 9999;
+    }
+    #voice-fab-inner {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #000;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+      transition: background 0.15s, transform 0.15s;
+      position: relative;
+    }
+    #voice-fab-inner:hover {
+      background: #CC0000;
+      transform: scale(1.08);
+    }
+    #voice-fab-inner.playing {
+      background: #CC0000;
+    }
+    #voice-fab-inner.loading {
+      background: #444;
+    }
+    #voice-icon-loading {
+      animation: voice-spin 0.8s linear infinite;
+    }
+    @keyframes voice-spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    #voice-tooltip {
+      position: absolute;
+      bottom: 58px;
+      right: 0;
+      background: #000;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 5px 10px;
+      border-radius: 2px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s;
+    }
+    #voice-fab-inner:hover #voice-tooltip {
+      opacity: 1;
+    }
+    #voice-fab-inner.loading #voice-tooltip::after {
+      content: 'Generating audio...';
+    }
+    #voice-no-key {
+      position: fixed;
+      bottom: 90px;
+      right: 28px;
+      background: #CC0000;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 10px 16px;
+      border-radius: 3px;
+      z-index: 9999;
+      max-width: 240px;
+      line-height: 1.5;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+  `;
+  document.head.appendChild(style);
+
+  btn.addEventListener('click', toggleVoice);
+}
+
+// ── GET PAGE TEXT ─────────────────────────────────────────────────
+// Extracts readable text from the current visible content,
+// skipping nav, buttons, icons, and UI chrome.
+function getPageText() {
+  // Priority targets per page type
+  const targets = [
+    document.getElementById('ch-body'),        // courses.html chapter body
+    document.getElementById('content'),         // courses.html home/quiz
+    document.querySelector('.scenario-slide'),  // scenarios.html
+    document.querySelector('.role-view.active .content'), // portal views
+    document.querySelector('main'),
+    document.body
+  ];
+
+  for (const el of targets) {
+    if (!el) continue;
+
+    // Clone to avoid mutating DOM
+    const clone = el.cloneNode(true);
+
+    // Remove unwanted elements
+    const remove = clone.querySelectorAll(
+      'button, .btn, nav, .sidebar, .topbar, .chapter-nav, ' +
+      '.kc-q, i, svg, .badge, .s-item, .s-logo, .timer, ' +
+      '.q-prog-bar, .opt-letter, script, style, .img-wrap, ' +
+      '.img-caption, .quiz-wrap .opt' // skip quiz answer options
+    );
+    remove.forEach(r => r.remove());
+
+    const text = clone.innerText || clone.textContent || '';
+    const cleaned = text
+      .replace(/\s+/g, ' ')
+      .replace(/[^\w\s.,;:!?'"-]/g, ' ')
+      .trim();
+
+    if (cleaned.length > 50) {
+      // Cap at ~3000 chars to stay within free tier limits per read
+      return cleaned.slice(0, 3000) + (cleaned.length > 3000 ? '...' : '');
+    }
+  }
+  return 'No readable content found on this page.';
+}
+
+// ── ELEVENLABS API CALL ───────────────────────────────────────────
+async function fetchElevenLabsAudio(text) {
+  if (ELEVEN_API_KEY === 'YOUR_API_KEY_HERE') {
+    showNoKeyNotice();
+    return null;
+  }
+
+  ttsState.abortController = new AbortController();
+
+  const response = await fetch(
+    `https://api.elevenlabs.io/v1/text-to-speech/${ELEVEN_VOICE_ID}`,
+    {
+      method: 'POST',
+      headers: {
+        'xi-api-key': ELEVEN_API_KEY,
+        'Content-Type': 'application/json',
+        'Accept': 'audio/mpeg'
+      },
+      body: JSON.stringify({
+        text: text,
+        model_id: ELEVEN_MODEL,
+        voice_settings: {
+          stability: 0.5,
+          similarity_boost: 0.75,
+          style: 0.0,
+          use_speaker_boost: true
+        }
+      }),
+      signal: ttsState.abortController.signal
+    }
+  );
+
+  if (!response.ok) {
+    const err = await response.text();
+    console.error('ElevenLabs error:', err);
+    throw new Error('ElevenLabs API error: ' + response.status);
+  }
+
+  const blob = await response.blob();
+  return URL.createObjectURL(blob);
+}
+
+// ── TOGGLE PLAY/PAUSE ─────────────────────────────────────────────
+async function toggleVoice() {
+  if (ttsState.loading) return;
+
+  // If currently playing — stop
+  if (ttsState.playing && ttsState.audio) {
+    ttsState.audio.pause();
+    ttsState.audio.currentTime = 0;
+    ttsState.audio = null;
+    setVoiceState('idle');
+    return;
+  }
+
+  // Start new read
+  setVoiceState('loading');
+  const text = getPageText();
+
+  try {
+    const audioUrl = await fetchElevenLabsAudio(text);
+    if (!audioUrl) { setVoiceState('idle'); return; }
+
+    const audio = new Audio(audioUrl);
+    ttsState.audio = audio;
+
+    audio.addEventListener('ended', () => {
+      setVoiceState('idle');
+      URL.revokeObjectURL(audioUrl);
+    });
+    audio.addEventListener('error', () => {
+      setVoiceState('idle');
+    });
+
+    await audio.play();
+    setVoiceState('playing');
+
+  } catch (err) {
+    if (err.name !== 'AbortError') {
+      console.error('Voice error:', err);
+      setVoiceState('idle');
+    }
+  }
+}
+
+// ── UI STATE ──────────────────────────────────────────────────────
+function setVoiceState(state) {
+  const inner = document.getElementById('voice-fab-inner');
+  const iconPlay = document.getElementById('voice-icon-play');
+  const iconPause = document.getElementById('voice-icon-pause');
+  const iconLoading = document.getElementById('voice-icon-loading');
+  const tooltip = document.getElementById('voice-tooltip');
+
+  inner.classList.remove('playing', 'loading');
+  iconPlay.style.display = 'none';
+  iconPause.style.display = 'none';
+  iconLoading.style.display = 'none';
+
+  if (state === 'idle') {
+    ttsState.playing = false;
+    ttsState.loading = false;
+    iconPlay.style.display = 'block';
+    tooltip.textContent = 'Read aloud';
+  } else if (state === 'loading') {
+    ttsState.loading = true;
+    ttsState.playing = false;
+    inner.classList.add('loading');
+    iconLoading.style.display = 'block';
+    tooltip.textContent = 'Generating...';
+  } else if (state === 'playing') {
+    ttsState.playing = true;
+    ttsState.loading = false;
+    inner.classList.add('playing');
+    iconPause.style.display = 'block';
+    tooltip.textContent = 'Stop reading';
+  }
+}
+
+// ── NO KEY NOTICE ─────────────────────────────────────────────────
+function showNoKeyNotice() {
+  const existing = document.getElementById('voice-no-key');
+  if (existing) { existing.remove(); return; }
+  const notice = document.createElement('div');
+  notice.id = 'voice-no-key';
+  notice.innerHTML = `
+    <strong>API key not set</strong><br>
+    Add your ElevenLabs key to enable voice.<br>
+    <a href="https://elevenlabs.io" target="_blank" style="color:#ffaaaa">Get a free key →</a>
+  `;
+  document.body.appendChild(notice);
+  setTimeout(() => notice.remove(), 5000);
+}
+
+// ── AUTO-STOP ON PAGE NAVIGATION ─────────────────────────────────
+// When chapter changes in courses.html, stop the current audio
+const _originalOpenChapter = window.openChapter;
+if (typeof _originalOpenChapter === 'function') {
+  window.openChapter = function(...args) {
+    if (ttsState.audio) {
+      ttsState.audio.pause();
+      ttsState.audio = null;
+      setVoiceState('idle');
+    }
+    return _originalOpenChapter.apply(this, args);
+  };
+}
+
+// ── INIT ──────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', injectVoiceButton);
+if (document.readyState !== 'loading') injectVoiceButton();
+
+</script>
 </body>
 </html>
