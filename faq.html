@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Archer SafeTrain - FAQ</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@100;400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--white:#FFF;--sand:#E5E0D9;--sand-light:#F2EFEB;--black:#000;--gray:#807A70;--red:#CC0000;--red-light:#FFF0F0}
+html,body{background:var(--sand-light);font-family:"Archivo",Arial,sans-serif;font-size:14px;color:var(--black)}
+.wrap{max-width:820px;margin:0 auto;padding:40px 28px 80px}
+.back-btn{display:inline-flex;align-items:center;gap:8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--gray);text-decoration:none;margin-bottom:28px;cursor:pointer;background:none;border:none}
+.back-btn:hover{color:var(--black)}
+.eyebrow{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.18em;color:var(--red);margin-bottom:10px}
+.page-title{font-size:32px;font-weight:100;margin-bottom:8px}
+.page-sub{font-size:14px;color:var(--gray);line-height:1.7;margin-bottom:32px;max-width:600px}
+
+/* Source banner */
+.source-banner{background:var(--black);color:var(--white);padding:16px 24px;border-radius:3px;margin-bottom:28px;display:flex;align-items:center;gap:16px}
+.source-logo{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.2em;flex-shrink:0}
+.source-text{font-size:12px;color:#888;line-height:1.5}
+
+/* Level badges */
+.level-tabs{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap}
+.level-tab{padding:6px 16px;border-radius:2px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;cursor:pointer;border:1.5px solid var(--sand);background:var(--white);color:var(--gray)}
+.level-tab.active{background:var(--black);border-color:var(--black);color:var(--white)}
+.level-tab.l1{border-color:var(--sand)}
+.level-tab.l2{border-color:var(--sand)}
+.level-tab.l3{border-color:var(--sand)}
+
+/* FAQ items */
+.faq-section{margin-bottom:28px}
+.faq-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:var(--gray);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--sand)}
+.faq-item{background:var(--white);border:1px solid var(--sand);border-radius:3px;margin-bottom:8px;overflow:hidden}
+.faq-q{padding:16px 20px;cursor:pointer;font-size:14px;font-weight:700;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;user-select:none;line-height:1.4}
+.faq-q:hover{background:var(--sand-light)}
+.faq-chevron{font-size:18px;flex-shrink:0;color:var(--gray);transition:transform .2s;margin-top:1px}
+.faq-chevron.open{transform:rotate(180deg)}
+.faq-a{display:none;padding:0 20px 16px;font-size:14px;line-height:1.8;color:var(--black);border-top:1px solid var(--sand)}
+.faq-a p{margin-top:14px;margin-bottom:0}
+.faq-a.show{display:block}
+
+/* Highlight boxes */
+.warn-box{background:var(--red-light);border:1px solid #FFCCCC;border-left:3px solid var(--red);padding:14px 16px;border-radius:2px;font-size:13px;color:var(--red);line-height:1.7;margin:12px 0 0}
+.info-box{background:var(--sand-light);border:1px solid var(--sand);border-left:3px solid var(--black);padding:14px 16px;border-radius:2px;font-size:13px;line-height:1.7;margin:12px 0 0}
+
+/* Training requirements table */
+.table-wrap{overflow-x:auto;margin-bottom:28px}
+table{width:100%;border-collapse:collapse;font-size:13px;background:var(--white)}
+th{background:var(--black);color:var(--white);padding:12px 16px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em}
+td{padding:12px 16px;border-bottom:1px solid var(--sand);vertical-align:top;line-height:1.6}
+tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:2px 10px;border-radius:2px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em}
+.b1{background:var(--sand);color:var(--black)}
+.b2{background:var(--black);color:var(--white)}
+.b3{background:var(--red);color:var(--white)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <button class="back-btn" onclick="history.back()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Back
+  </button>
+
+  <div class="eyebrow">Archer EHS</div>
+  <div class="page-title">Electrical Safety Training FAQ</div>
+  <div class="page-sub">Official guidance from Archer EHS on training requirements, authorization, and compliance. Source: Archer Electrical Safety Training Information and FAQs (updated Feb 21, 2025).</div>
+
+  <div class="source-banner">
+    <div class="source-logo">Archer</div>
+    <div class="source-text">This FAQ is sourced directly from Archer EHS official documentation. These are the authoritative answers to common questions about the electrical safety training program. Contact Archer EHS on Slack for additional questions.</div>
+  </div>
+
+  <!-- Training Requirements Table -->
+  <div class="faq-section">
+    <div class="faq-section-title">Training Requirements Overview</div>
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>Level</th>
+          <th>Authorized Work</th>
+          <th>Format</th>
+          <th>Duration</th>
+          <th>Valid For</th>
+        </tr>
+        <tr>
+          <td><span class="badge b1">Level 1</span></td>
+          <td>Access to restricted areas and labs</td>
+          <td>Remote</td>
+          <td>1 hour</td>
+          <td>2 years</td>
+        </tr>
+        <tr>
+          <td><span class="badge b2">Level 2</span></td>
+          <td>Work on de-energized HV systems (HV = 50V AC/DC)<br>Work on energized, enclosed, normal operation HV systems</td>
+          <td>In-Person at HQ</td>
+          <td>4 hours</td>
+          <td>2 years</td>
+        </tr>
+        <tr>
+          <td><span class="badge b3">Level 3</span></td>
+          <td>Work on energized, exposed HV systems<br>Work on energized, enclosed, abnormally operating HV systems</td>
+          <td>In-Person at HQ</td>
+          <td>4 hours</td>
+          <td>2 years</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- FAQ: Prerequisites -->
+  <div class="faq-section">
+    <div class="faq-section-title">Prerequisites and Level Requirements</div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">
+        Can I skip Level 1 if I need Level 2 training?
+        <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </div>
+      <div class="faq-a">
+        <p>Yes. Level 1 is <strong>not</strong> a prerequisite for Level 2. If your role requires Level 2, you can attend Level 2 training directly without completing Level 1 first.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">
+        Can I skip Level 2 if I need Level 3 training?
+        <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </div>
+      <div class="faq-a">
+        <p>No. Level 2 is a prerequisite for Level 3. You must complete Level 2 before you can attend Level 3 training.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ: Format and Attendance -->
+  <div class="faq-section">
+    <div class="faq-section-title">Format and Attendance</div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">
+        Can these trainings be attended remotely?
+        <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </div>
+      <div class="faq-a">
+        <p>Only Level 1 training can be attended remotely. Level 2 and Level 3 training must be completed in-person at HQ.</p>
+        <div class="warn-box">Level 2 and Level 3 are in-person only. Work with your manager to schedule dedicated onsite time to attend these sessions.</div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">
+        I don't have time to attend the training. What should I do?
+        <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </div>
+      <div class="faq-a">
+        <p>This training is <strong>mandatory</strong> to perform this type of dangerous work. If you do not attend the training you are not allowed to complete the work.</p>
+        <div class="warn-box">Disciplinary action will be taken if you are discovered performing work that you have not been trained to do.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ: Validity and Retraining -->
+  <div class="faq-section">
+    <div class="faq-section-title">Validity and Retraining</div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">
+        How long is the training valid? How often is retraining required?
+        <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </div>
+      <div class="faq-a">
+        <p>All training levels are valid for <strong>2 years</strong>. New employees, or employees who are performing new electrical tasks, may not perform any of those tasks until properly trained.</p>
+        <div class="info-box">Existing employees who completed previous Level 2 training must be retrained by the end of 2025, but may continue performing work during this transition period.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ: Authorization -->
+  <div class="faq-section">
+    <div class="faq-section-title">Authorization and Quiz Requirements</div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">
+        Am I authorized to perform work immediately after training?
+        <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </div>
+      <div class="faq-a">
+        <p>This depends on the level:</p>
+        <p><strong>Level 1 and Level 2:</strong> You are authorized to perform work immediately after completing training.</p>
+        <p><strong>Level 3:</strong> A skills evaluation and manager approval are required before you receive authorization. You are not automatically authorized after attending the training session.</p>
+        <div class="warn-box">The quiz and skills evaluation can be failed, and will result in authorization being withheld.</div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">
+        Will there be a test or other type of authorization?
+        <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </div>
+      <div class="faq-a">
+        <p>Yes. Level 2 and Level 3 require attendees to successfully pass a quiz or skills evaluation. Failure results in authorization being withheld until the requirements are met.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ: Compliance and Enforcement -->
+  <div class="faq-section">
+    <div class="faq-section-title">Compliance and Enforcement</div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">
+        How do I know if members of my team are trained?
+        <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </div>
+      <div class="faq-a">
+        <p>Employees performing electrical work are required to wear physical badges while at work. These badges will have a sticker placed on the back that indicates what level of training the employee has completed.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">
+        What do I do if I encounter someone performing work who is not authorized?
+        <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </div>
+      <div class="faq-a">
+        <p>Report the person to a nearby supervisor immediately. Supervisors must pause the work immediately.</p>
+        <div class="warn-box">Supervisors must also report this incident as a "near-miss" to Archer EHS using the Incident Report Form.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ: Resources -->
+  <div class="faq-section">
+    <div class="faq-section-title">Resources and Contact</div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">
+        Is there a program that provides general guidance for electrical work?
+        <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </div>
+      <div class="faq-a">
+        <p>Yes. Archer's Electrical Safety Program can serve as a reference for best practices and requirements when performing electrical work. Contact Archer EHS for access.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">
+        Who should I contact if I have more questions?
+        <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </div>
+      <div class="faq-a">
+        <p>Contact <strong>Archer EHS on Slack</strong> for any questions about the electrical safety training program.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function toggle(el) {
+  var answer = el.nextElementSibling;
+  var chevron = el.querySelector('.faq-chevron');
+  var isOpen = answer.classList.contains('show');
+  answer.classList.toggle('show', !isOpen);
+  chevron.classList.toggle('open', !isOpen);
+}
+</script>
+</body>
+</html>
